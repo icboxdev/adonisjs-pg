@@ -1,38 +1,78 @@
 # Enterprise Backend API | AdonisJS v6
 
-Este repositório hospeda o core backend de uma aplicação robusta desenvolvida com **AdonisJS v6**. O projeto foi concebido seguindo princípios de **Clean Architecture**, **SOLID** e foco total em type-safety para garantir escalabilidade e fácil manutenção.
+Este é um backend **stateless** de alta performance desenvolvido com **AdonisJS v6**. A aplicação é focada exclusivamente em fornecer uma infraestrutura de API robusta, com autenticação avançada, sistema de cache distribuído e suporte a integrações externas.
 
+## 🛠️ Tech Stack & Infrastructure
 
-
-## 🛠️ Tech Stack
-
-* **Framework:** [AdonisJS v6](https://docs.adonisjs.com/guides/introduction)
-* **Runtime:** Node.js v20+
+* **Framework:** [AdonisJS v6](https://docs.adonisjs.com/guides/introduction) (Pure API Mode)
 * **Language:** TypeScript
-* **ORM:** Lucid (Active Record)
+* **Runtime:** Node.js v20+
+* **Database:** PostgreSQL (Lucid ORM)
+* **Cache & Transport:** [Redis](https://redis.io/)
 * **Validation:** VineJS
-* **Database:** PostgreSQL (Recomendado)
-* **Authentication:** AdonisJS Auth (OATH/Token)
+
+## 🔐 Authentication & Security
+
+A API conta com um sistema de autenticação híbrido e resiliente:
+
+* **Access Tokens (OAT):** Autenticação padrão para usuários/clientes da plataforma.
+* **API Key Management:** Sistema integrado para geração, expiração e revogação de chaves de API, ideal para parceiros e automações.
+* **Security-First:** Proteção nativa contra ataques comuns e gerenciamento rigoroso de permissões.
 
 ## 🚀 Key Features
 
-* **Service Layer Pattern:** Lógica de negócio isolada dos Controllers para maior testabilidade.
-* **Standardized Responses:** Middleware para padronização de respostas JSON e tratamento global de erros.
-* **Strict Typing:** Interfaces e tipos customizados para garantir integridade em todo o fluxo de dados.
-* **Security:** Proteção contra CSRF, XSS e SQL Injection nativa, além de configuração de Rate Limiting.
-* **Automated Testing:** Cobertura de testes funcionais e unitários utilizando Japa.
+* **Redis Caching:** Camada de cache otimizada para redução de latência e carga no banco de dados.
+* **Webhooks (Gatilhos):** Sistema de gatilhos para integração ativa com plataformas externas, permitindo arquiteturas baseadas em eventos.
+* **Service Layer:** Toda a lógica de negócio, inclusive o gerenciamento de API Keys, está isolada em serviços testáveis.
+* **High Availability:** Arquitetura pronta para escalabilidade horizontal.
 
 ## ⚙️ Setup & Installation
 
 ### Prerequisites
 
-* Node.js (v20.x ou superior)
-* Package Manager (npm/pnpm/yarn)
-* Instância de banco de dados (Docker recomendado)
+* Node.js v20.x+
+* PostgreSQL
+* Redis Instance
 
-### Steps
+### Quick Start
 
-1. **Clone o repositório:**
-   ```bash
-   git clone [https://github.com/icboxdev/adonisjs.git](https://github.com/icboxdev/adonisjs.git)
-   cd adonisjs
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/adonisjs/adonisjs.git](https://github.com/adonisjs/adonisjs.git)
+    cd adonisjs
+    ```
+
+2.  **Instale as dependências:**
+    ```bash
+    npm install
+    ```
+
+3.  **Configuração de Ambiente:**
+    ```bash
+    cp .env.example .env
+    # Certifique-se de configurar as credenciais do Redis e DB
+    ```
+
+4.  **Database & Migrations:**
+    ```bash
+    node ace migration:run
+    ```
+
+5.  **Running:**
+    ```bash
+    npm run dev
+    ```
+
+## 📂 Arquitetura do Sistema
+
+```text
+├── app/
+│   ├── Controllers/    # Endpoints da API
+│   ├── Models/         # Lucid Models (User, ApiKey, etc.)
+│   ├── Services/       # Business Logic (Auth, Cache, Webhooks)
+│   ├── Validators/     # Validações VineJS
+│   └── Middleware/     # Auth Guards & Cache Handlers
+├── config/             # Redis, Auth, e App configs
+├── database/           # Migrations & Seeders
+├── start/              # API Routes
+└── tests/              # Japa Test Suites
