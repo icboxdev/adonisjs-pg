@@ -48,5 +48,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PASSWORD: Env.schema.string(),
 
   LOGGER_REDIS_KEY: Env.schema.string(),
-  LOGGER_REDIS_TTL: Env.schema.string()
+  LOGGER_REDIS_TTL: Env.schema.string(),
+
+  PRIVATE_KEY: Env.schema.string()
 })

@@ -15,3 +15,7 @@ import '#routes/app_test'
 import '#routes/webhook_routes_v1'
 
 router.where('id', router.matchers.number())
+
+router.get('/', async () => {
+  return { online: true }
+})
