@@ -11,6 +11,7 @@ import { sharedCache } from '#services/shared/cache_service'
 import { TokenService } from '#services/auth/token_service'
 import { RoleService, UserRole } from '#services/auth/role_service'
 import { LoginProtectionService } from '#services/security/login_protection_service'
+import hash from '@adonisjs/core/services/hash'
 
 interface LoginParams {
   email: string
@@ -159,6 +160,23 @@ export class AuthService {
   /* -------------------------------------------------------------------------- */
   static async requestPasswordReset(email: string, ip?: string): Promise<boolean> {
     return await PasswordService.requestPasswordReset({ email, ip })
+  }
+
+  static async updatePassword(
+    user: User,
+    password: string,
+    currentPassword: string
+  ): Promise<boolean> {
+    const isPasswordValid = await hash.verify(user.password, currentPassword)
+    
+    if (!isPasswordValid) {
+      throw new Exception('Senha atual inválida', { status: 400 })
+    }
+
+    user.password = password
+    await user.save()
+    await UserService.invalidateUserCache(user.id)
+    return true
   }
 
   static async resetPassword(params: {

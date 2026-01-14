@@ -6,12 +6,62 @@ import {
   authUpdateValidator,
   RequestEmailValidator,
   passwordResetValidator,
+  authPasswordUpdateValidator,
+  userCreateValidator,
 } from '#validators/app_validators'
 import { errors as vineErrors } from '@vinejs/vine'
 import { Exception } from '@adonisjs/core/exceptions'
 import logger from '@adonisjs/core/services/logger'
 
 export default class AuthController {
+  async checkStartSetup({ response }: HttpContext) {
+    try {
+      const startSetup = await UserService.checkStartSetup()
+      return response.ok({ started: startSetup })
+    } catch (error) {
+      logger.error({ err: error }, 'Failed to check start setup')
+      return this.handleError(error, response, 'Falha ao verificar setup inicial')
+    }
+  }
+  async createSuperUser({ request, response }: HttpContext) {
+    try {
+      const payload = await request.validateUsing(userCreateValidator)
+
+      const isBlacklisted = await AuthService.isBlacklisted({
+        email: payload.email,
+        username: payload.email,
+      })
+
+      if (isBlacklisted) {
+        return response.forbidden({
+          message: 'Este email ou username não pode ser utilizado',
+        })
+      }
+      const success = await UserService.createSuperAdmin(payload)
+
+      if (!success) {
+        return response.badRequest({
+          message: 'Já existe um super administrador cadastrado.',
+        })
+      }
+
+      return response.ok({
+        message: 'Super administrador criado com sucesso',
+      })
+    } catch (error) {
+      if (error instanceof vineErrors.E_VALIDATION_ERROR) {
+        return response.unprocessableEntity({
+          message: 'Erro de validação',
+          errors: error.messages,
+        })
+      }
+
+      logger.error({ err: error }, 'Failed to create super user')
+      return this.handleError(error, response, 'Falha ao criar super usuário')
+    }
+  }
+
+  //
   async login({ request, response }: HttpContext) {
     try {
       const { email, password } = request.only(['email', 'password'])
@@ -20,8 +70,10 @@ export default class AuthController {
       const { token, user } = await AuthService.login({ email, password, ip })
 
       return response.ok({
-        message: 'Login realizado com sucesso',
-        data: { token, user },
+        authenticate: true,
+        token,
+        tokenType: 'Bearer',
+        user,
       })
     } catch (error) {
       if (error.status === 401) {
@@ -77,7 +129,7 @@ export default class AuthController {
       const user = auth.getUserOrFail()
       const authUser = await AuthService.getMe(user)
 
-      return response.ok({ data: authUser.serialize() })
+      return response.ok({ user: authUser.serialize() })
     } catch (error) {
       if (error.status === 403) {
         return response.forbidden({ message: error.message })
@@ -110,7 +162,7 @@ export default class AuthController {
 
       return response.ok({
         message: 'Dados atualizados com sucesso',
-        data: updatedUser,
+        user: updatedUser,
       })
     } catch (error) {
       if (error instanceof vineErrors.E_VALIDATION_ERROR) {
@@ -218,6 +270,33 @@ export default class AuthController {
 
       logger.error({ err: error, email: request.input('email') }, 'Password reset request failed')
       return this.handleError(error, response, 'Falha ao solicitar recuperação de senha')
+    }
+  }
+
+  async changePassword({ auth, request, response }: HttpContext) {
+    try {
+      const user = auth.getUserOrFail()
+      const { password, currentPassword } = await request.validateUsing(authPasswordUpdateValidator)
+
+      await AuthService.updatePassword(user, password, currentPassword)
+
+      return response.ok({
+        message: 'Senha alterada com sucesso',
+      })
+    } catch (error) {
+      if (error instanceof vineErrors.E_VALIDATION_ERROR) {
+        return response.unprocessableEntity({
+          message: 'Erro de validação',
+          errors: error.messages,
+        })
+      }
+
+      if (error.status === 400) {
+        return response.badRequest({ message: error.message })
+      }
+
+      logger.error({ err: error, userId: auth.user?.id }, 'Password change failed')
+      return this.handleError(error, response, 'Falha ao alterar senha')
     }
   }
 

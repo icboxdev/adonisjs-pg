@@ -13,12 +13,18 @@ router
     router.post('password/reset-request', [AuthController, 'requestPasswordReset' ])
     router.post('password/reset', [AuthController, 'resetPassword'])
 
+    router.group(() => {
+      router.post('create', [AuthController, 'createSuperUser'])
+      router.get('check', [AuthController, 'checkStartSetup'])
+    }).prefix('setup')
+    
     router
       .group(() => {
         router.post('logout', [AuthController, 'logout'])
-        router.post('revoke', [AuthController, 'revokeAll'])
+        router.post('revoker-acess', [AuthController, 'revokeAll'])
         router.get('me', [AuthController, 'me'])
         router.put('me', [AuthController, 'updateMe'])
+        router.post('password/change', [AuthController, 'changePassword'])
         router.post('email/verify', [AuthController, 'verifyEmail'])
         router.post('email/verify-request', [AuthController, 'requestEmailVerification'])
       })

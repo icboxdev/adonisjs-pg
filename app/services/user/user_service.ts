@@ -1,4 +1,5 @@
 import User from '#models/user'
+import { UserRole } from '#services/auth/role_service'
 import { sharedCache } from '#services/shared/cache_service'
 import CacheService from '#start/cache'
 import { Exception } from '@adonisjs/core/exceptions'
@@ -71,6 +72,27 @@ export class UserService {
     await this.invalidateUserCache(user.id)
     await user.delete()
     return true
+  }
+
+  static async checkStartSetup(): Promise<boolean> {
+    const existingSuperAdmin = await User.query()
+      .where('is_deleted', false)
+      .andWhere('role', UserRole.SUPER)
+      .first()
+
+    return !existingSuperAdmin
+  }
+
+  static async createSuperAdmin(payload: UserEntity): Promise<boolean> {
+    const startSetup = await this.checkStartSetup()
+    if (startSetup) {
+      payload.role = UserRole.SUPER
+      payload.isActive = true
+      await User.create({ isDeleted: false, ...payload })
+      return true
+    } else {
+      throw new Error('Já existe um super administrador cadastrado.')
+    }
   }
 
   static async invalidateUserCache(id: number): Promise<void> {

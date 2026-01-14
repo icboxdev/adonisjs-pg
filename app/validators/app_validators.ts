@@ -11,12 +11,14 @@ export const passwordResetValidator = vine.compile(
   vine.object({
     email: vine.string().email().normalizeEmail().trim(),
     token: vine.string().trim(),
-    password: vine
-      .string()
-      .minLength(8)
-      .maxLength(32)
-      .trim()
-      .confirmed({ confirmationField: 'passwordConfirmation' }),
+    password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
+  })
+)
+
+export const authPasswordUpdateValidator = vine.compile(
+  vine.object({
+    currentPassword: vine.string().minLength(8).maxLength(32).trim(),
+    password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
   })
 )
 
@@ -25,13 +27,7 @@ export const authUpdateValidator = vine.compile(
     email: vine.string().email().normalizeEmail().trim().optional(),
     name: vine.string().minLength(3).maxLength(96).trim().optional(),
     lastName: vine.string().minLength(3).maxLength(128).trim().optional(),
-    password: vine
-      .string()
-      .minLength(8)
-      .maxLength(32)
-      .trim()
-      .confirmed({ confirmationField: 'passwordConfirmation' })
-      .optional(),
+    password: vine.string().minLength(8).maxLength(32).trim().confirmed().optional(),
     settings: vine.object({}).allowUnknownProperties().optional(),
   })
 )
@@ -40,12 +36,7 @@ export const userCreateValidator = vine.compile(
   vine.object({
     name: vine.string().minLength(3).maxLength(96).trim(),
     email: vine.string().email().normalizeEmail().trim(),
-    password: vine
-      .string()
-      .minLength(8)
-      .maxLength(32)
-      .trim()
-      .confirmed({ confirmationField: 'passwordConfirmation' }),
+    password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
     isActive: vine.boolean(),
     role: vine.enum(['view', 'user', 'admin', 'super'] as const),
     username: vine.string().minLength(6).maxLength(128).trim(),
@@ -61,12 +52,7 @@ export const userUpdateValidator = vine.compile(
   vine.object({
     name: vine.string().minLength(3).maxLength(96).trim().optional(),
     email: vine.string().email().normalizeEmail().trim().optional(),
-    password: vine
-      .string()
-      .minLength(8)
-      .maxLength(32)
-      .trim()
-      .confirmed({ confirmationField: 'passwordConfirmation' }),
+    password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
     isActive: vine.boolean().optional(),
     role: vine.enum(['view', 'user', 'admin', 'super'] as const).optional(),
     username: vine.string().minLength(6).maxLength(128).trim().optional(),
