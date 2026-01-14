@@ -10,7 +10,7 @@ export default class UsersController {
   async index({ response }: HttpContext) {
     try {
       const users = await UserService.list()
-      return response.ok({ data: users })
+      return response.ok(users)
     } catch (error) {
       return this.handleError(error, response, 'Falha ao buscar usuários')
     }
@@ -32,7 +32,7 @@ export default class UsersController {
       }
 
       const user = await UserService.create(payload)
-      return response.created({ data: user })
+      return response.created(user)
     } catch (error) {
       if (error instanceof vineErrors.E_VALIDATION_ERROR) {
         return response.unprocessableEntity({
@@ -48,7 +48,7 @@ export default class UsersController {
   async show({ params, response }: HttpContext) {
     try {
       const user = await UserService.findById(params.id)
-      return response.ok({ data: user.serialize() })
+      return response.ok(user.serialize())
     } catch (error) {
       if (error.status === 404) {
         return response.notFound({
@@ -79,7 +79,7 @@ export default class UsersController {
       }
 
       const updatedUser = await AuthService.updateUser(user, payload)
-      return response.ok({ data: updatedUser })
+      return response.ok(updatedUser)
     } catch (error) {
       if (error instanceof vineErrors.E_VALIDATION_ERROR) {
         return response.unprocessableEntity({
@@ -127,11 +127,10 @@ export default class UsersController {
       const user = await UserService.findById(params.id)
 
       await UserService.delete(user)
-      
+
       return response.ok({
         message: 'Usuário anonimizado com sucesso',
       })
-
     } catch (error) {
       if (error.status === 404) {
         return response.notFound({

@@ -200,7 +200,7 @@ export default class AuthController {
       }
 
       return response.ok({
-        message: 'Instruções de recuperação de senha enviadas para o e-mail',
+        message: 'Código de recuperação de senha foi enviado para o e-mail',
       })
     } catch (error) {
       if (error instanceof vineErrors.E_VALIDATION_ERROR) {

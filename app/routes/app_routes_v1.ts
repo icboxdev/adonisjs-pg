@@ -33,4 +33,4 @@ router
       .prefix('admin')
       // .middleware(middleware.authRole(UserRole.ADMIN))
   })
-  .prefix('api')
+  .prefix('api/v1')
