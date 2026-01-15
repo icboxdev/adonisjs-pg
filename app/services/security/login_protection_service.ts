@@ -8,7 +8,7 @@ interface LoginAttemptParams {
   ip: string
   success: boolean
   userName?: string
-  userEmail?: string
+  userEmail?: string | null
 }
 
 interface LoginCheckParams {

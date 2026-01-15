@@ -14,7 +14,7 @@ import { LoginProtectionService } from '#services/security/login_protection_serv
 import hash from '@adonisjs/core/services/hash'
 
 interface LoginParams {
-  email: string
+  username: string
   password: string
   ip?: string
 }
@@ -32,15 +32,15 @@ export class AuthService {
 
   // SUBSTITUIR o método login() por:
   static async login(params: LoginParams): Promise<LoginResult> {
-    const { email, password, ip = 'unknown' } = params
+    const { username, password, ip = 'unknown' } = params
 
-    if (!email || !password) {
+    if (!username || !password) {
       throw new Exception('Credenciais inválidas', { status: 401 })
     }
 
     // Verifica se pode fazer login
     const loginCheck = await LoginProtectionService.checkLoginAttempt({
-      identifier: email.trim().toLowerCase(),
+      identifier: username.trim().toLowerCase(),
       ip,
     })
 
@@ -58,35 +58,35 @@ export class AuthService {
       )
     }
 
-    const user = await User.query().where('email', email).orWhere('username', email).first()
+    const user = await User.query().where('username', username).orWhere('email', username).first()
 
     if (!user || !UserService.isActive(user)) {
       // Registra tentativa falha
       await LoginProtectionService.recordLoginAttempt({
-        identifier: email.trim().toLowerCase(),
+        identifier: username.trim().toLowerCase(),
         ip,
         success: false,
       })
       throw new Exception('Credenciais inválidas', { status: 401 })
     }
 
-    const authUser = await User.verifyCredentials(email, password)
+    const authUser = await User.verifyCredentials(username, password)
 
     if (!authUser) {
       // Registra tentativa falha com dados do usuário
       await LoginProtectionService.recordLoginAttempt({
-        identifier: email.trim().toLowerCase(),
+        identifier: username.trim().toLowerCase(),
         ip,
         success: false,
         userName: user.name,
-        userEmail: user.email,
+        userEmail: user.email || user.username,
       })
       throw new Exception('Credenciais inválidas', { status: 401 })
     }
 
     // Login bem-sucedido - limpa tentativas
     await LoginProtectionService.recordLoginAttempt({
-      identifier: email.trim().toLowerCase(),
+      identifier: username.trim().toLowerCase(),
       ip,
       success: true,
     })
@@ -202,7 +202,7 @@ export class AuthService {
   /* -------------------------------------------------------------------------- */
   /* BLACKLIST (DELEGAÇÃO)                                                      */
   /* -------------------------------------------------------------------------- */
-  static async isBlacklisted(input: { email: string; username: string }): Promise<boolean> {
+  static async isBlacklisted(input: { email: string; username?: string }): Promise<boolean> {
     return await BlacklistService.isBlacklisted(input)
   }
 

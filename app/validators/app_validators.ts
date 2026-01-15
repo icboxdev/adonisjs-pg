@@ -26,7 +26,6 @@ export const authUpdateValidator = vine.compile(
   vine.object({
     email: vine.string().email().normalizeEmail().trim().optional(),
     name: vine.string().minLength(3).maxLength(96).trim().optional(),
-    lastName: vine.string().minLength(3).maxLength(128).trim().optional(),
     password: vine.string().minLength(8).maxLength(32).trim().confirmed().optional(),
     settings: vine.object({}).allowUnknownProperties().optional(),
   })
@@ -35,12 +34,11 @@ export const authUpdateValidator = vine.compile(
 export const userCreateValidator = vine.compile(
   vine.object({
     name: vine.string().minLength(3).maxLength(96).trim(),
-    email: vine.string().email().normalizeEmail().trim(),
+    email: vine.string().email().normalizeEmail().trim().optional(),
     password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
     isActive: vine.boolean(),
     role: vine.enum(['view', 'user', 'admin', 'super'] as const),
     username: vine.string().minLength(6).maxLength(128).trim(),
-    lastName: vine.string().minLength(3).maxLength(128).trim(),
     emailVerifiedAt: vine
       .date()
       .optional()
@@ -55,8 +53,7 @@ export const userUpdateValidator = vine.compile(
     password: vine.string().minLength(8).maxLength(32).trim().confirmed(),
     isActive: vine.boolean().optional(),
     role: vine.enum(['view', 'user', 'admin', 'super'] as const).optional(),
-    username: vine.string().minLength(6).maxLength(128).trim().optional(),
-    lastName: vine.string().minLength(3).maxLength(128).trim().optional(),
+    // username: vine.string().minLength(6).maxLength(128).trim().optional(),
     lastIp: vine.string().trim().optional(),
     emailVerifiedAt: vine
       .date()

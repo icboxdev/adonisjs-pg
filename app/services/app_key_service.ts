@@ -44,7 +44,11 @@ export class AppKeyService {
   /* ----------------------------- Key Utilities ------------------------------ */
 
   static getPrivateKey(): string {
-    return env.get('APP_KEY')
+    return env.get('PRIVATE_KEY')
+  }
+
+  static getPublicKey(): string {
+    return env.get('PUBLIC_KEY')
   }
 
   static calculateExpiration(days = 365): DateTime {

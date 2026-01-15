@@ -11,8 +11,6 @@ export default class AuthDeleted extends BaseModel {
   @column()
   declare userEmail: string
 
-  @column()
-  declare userName: string
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

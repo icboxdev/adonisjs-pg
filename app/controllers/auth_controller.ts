@@ -27,16 +27,6 @@ export default class AuthController {
     try {
       const payload = await request.validateUsing(userCreateValidator)
 
-      const isBlacklisted = await AuthService.isBlacklisted({
-        email: payload.email,
-        username: payload.email,
-      })
-
-      if (isBlacklisted) {
-        return response.forbidden({
-          message: 'Este email ou username não pode ser utilizado',
-        })
-      }
       const success = await UserService.createSuperAdmin(payload)
 
       if (!success) {
@@ -64,13 +54,13 @@ export default class AuthController {
   //
   async login({ request, response }: HttpContext) {
     try {
-      const { email, password } = request.only(['email', 'password'])
+      const { username, password } = request.only(['username', 'password'])
       const ip = request.ip()
 
-      const { token, user } = await AuthService.login({ email, password, ip })
+      const { token, user } = await AuthService.login({ username, password, ip })
 
       return response.ok({
-        authenticate: true,
+        isAuthenticated: true,
         token,
         tokenType: 'Bearer',
         user,
@@ -129,7 +119,7 @@ export default class AuthController {
       const user = auth.getUserOrFail()
       const authUser = await AuthService.getMe(user)
 
-      return response.ok({ user: authUser.serialize() })
+      return response.ok({ user: authUser, isAuthenticated: true})
     } catch (error) {
       if (error.status === 403) {
         return response.forbidden({ message: error.message })
@@ -148,7 +138,7 @@ export default class AuthController {
       if (payload.email && payload.email !== user.email) {
         const isBlacklisted = await AuthService.isBlacklisted({
           email: payload.email,
-          username: payload.email,
+          username: 'not_found',
         })
 
         if (isBlacklisted) {
@@ -223,7 +213,7 @@ export default class AuthController {
         })
       }
 
-      await AuthService.verifyEmail(user.email, token, ip)
+      await AuthService.verifyEmail(user.email || user.username, token, ip)
 
       return response.ok({
         message: 'E-mail verificado com sucesso',

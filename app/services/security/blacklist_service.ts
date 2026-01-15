@@ -6,18 +6,15 @@ import logger from '@adonisjs/core/services/logger'
 
 interface BlacklistCheckInput {
   email: string
-  username: string
 }
 
 export class BlacklistService {
   static async isBlacklisted(input: BlacklistCheckInput): Promise<boolean> {
     try {
       const emailHash = this.hashValue(input.email)
-      const usernameHash = this.hashValue(input.username)
 
       const record = await AuthDeleted.query()
         .where('user_email', emailHash)
-        .orWhere('user_name', usernameHash)
         .first()
 
       return !!record
@@ -37,13 +34,11 @@ export class BlacklistService {
         throw new Exception('Usuário já está na lista negra', { status: 400 })
       }
 
-      const emailHash = this.hashValue(user.email)
-      const usernameHash = this.hashValue(user.username || user.email)
+      const emailHash = this.hashValue(user.email || user.username)
 
       await AuthDeleted.create({
         userId: user.id.toString(),
         userEmail: emailHash,
-        userName: usernameHash,
       })
     } catch (error) {
       logger.error({ err: error }, 'Failed to add user to blacklist')

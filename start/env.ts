@@ -50,5 +50,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   LOGGER_REDIS_KEY: Env.schema.string(),
   LOGGER_REDIS_TTL: Env.schema.string(),
 
-  PRIVATE_KEY: Env.schema.string()
+  PRIVATE_KEY: Env.schema.string(),
+  PUBLIC_KEY: Env.schema.string(),
 })

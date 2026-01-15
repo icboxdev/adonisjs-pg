@@ -7,9 +7,8 @@ import { Exception } from '@adonisjs/core/exceptions'
 export interface UserEntity {
   isActive: boolean
   name: string
-  lastName: string | null
-  email: string
-  username: string | null
+  email?: string | null
+  username: string 
   password: string
   role: string
   settings?: object | any | null
@@ -18,9 +17,7 @@ export interface UserEntity {
 export interface UserEntityUpdate {
   active?: boolean
   name?: string
-  lastName?: string | null
-  email?: string
-  username?: string | null
+  email?: string | null
   password?: string
   role?: string
   settings?: object | any | null

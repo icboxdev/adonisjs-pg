@@ -17,7 +17,7 @@ interface TokenValidationParams {
 
 export class TokenService {
   static async generateSecureToken(): Promise<TokenGenerationResult> {
-    const token = randomBytes(32).toString('hex')
+    const token = randomBytes(16).toString('hex')
     const hash = createHash('sha256').update(token).digest('hex')
     return { token, hash }
   }
@@ -48,7 +48,7 @@ export class TokenService {
 
   static async createAccessToken(user: User) {
     await this.revokeAllAccessTokens(user)
-    return await User.accessTokens.create(user)
+    return await User.accessTokens.create(user, ['*'], { name: 'access_token', expiresIn: 86400 })
   }
 
   static async revokeAllAccessTokens(user: User): Promise<void> {

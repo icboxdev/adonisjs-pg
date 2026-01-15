@@ -5,16 +5,18 @@ import type { NextFn } from '@adonisjs/core/types/http'
 
 export default class AuthRoleMiddleware {
   async handle(ctx: HttpContext, next: NextFn, role: UserRole) {
-    const user = ctx.auth.user as User
+    const user = (await ctx.auth.authenticate()) as User
 
-    if (!user || user.isActive === false || user.role === null) {
-      return ctx.response.unauthorized({ message: 'No user authenticated' })
+    if (!user.isActive || user.isDeleted) {
+      return ctx.response.unauthorized({ message: 'User account is inactive or deleted' })
     }
 
     try {
       RoleService.checkRole(user, role)
     } catch (error) {
-      return ctx.response.forbidden({ message: 'Acesso negado' })
+      return ctx.response.forbidden({
+        message: 'You do not have permission to access this resource',
+      })
     }
 
     return await next()

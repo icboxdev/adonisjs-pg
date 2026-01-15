@@ -39,6 +39,7 @@ router.use([() => import('@adonisjs/core/bodyparser_middleware'), () => import('
  * the routes or the routes group.
  */
 export const middleware = router.named({
+  anonKey: () => import('#middleware/anon_key_middleware'),
   authRole: () => import('#middleware/auth_role_middleware'),
   privateKey: () => import('#middleware/private_key_middleware'),
   appKey: () => import('#middleware/app_key_middleware'),

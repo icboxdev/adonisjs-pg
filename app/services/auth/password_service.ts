@@ -99,7 +99,7 @@ export class PasswordService {
 
   private static async sendResetEmail(user: User, token: string): Promise<void> {
     await EmailService.send({
-      to: user.email,
+      to: user.email || user.username,
       subject: 'Recuperação de senha',
       isHtml: true,
       body: `
@@ -113,7 +113,7 @@ export class PasswordService {
 
   private static async sendSuccessEmail(user: User, ip: string): Promise<void> {
     await EmailService.send({
-      to: user.email,
+      to: user.email || user.username,
       subject: 'Senha alterada com sucesso',
       isHtml: true,
       body: `
@@ -128,7 +128,7 @@ export class PasswordService {
 
   private static async sendBlockedNotification(user: User, ip: string): Promise<void> {
     await EmailService.send({
-      to: user.email,
+      to: user.email || user.username,
       subject: 'Tentativas excessivas de recuperação de senha',
       isHtml: true,
       body: `

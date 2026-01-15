@@ -26,7 +26,7 @@ router
         router.post('email/verify-request', [AuthController, 'requestEmailVerification'])
       })
       .prefix('auth')
-      .middleware(middleware.authRole(UserRole.VIEW))
-
+      .middleware((middleware.auth(), middleware.authRole(UserRole.VIEW)))
   })
   .prefix('api/v1')
+  .middleware(middleware.anonKey())

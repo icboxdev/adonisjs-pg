@@ -8,7 +8,6 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('user_id')
       table.string('user_email')
-      table.string('user_name')
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

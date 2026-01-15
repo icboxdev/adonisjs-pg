@@ -12,8 +12,7 @@ export class UserAnonymizationService {
 
     user.merge({
       email: `deleted_${user.id}@internal.system`,
-      name: 'User',
-      lastName: 'Deleted',
+      name: 'User Deleted',
       username: `deleted_user_${user.id}`,
       password: randomPassword,
       role: UserRole.DELETED,
