@@ -202,7 +202,7 @@ export class AuthService {
   /* -------------------------------------------------------------------------- */
   /* BLACKLIST (DELEGAÇÃO)                                                      */
   /* -------------------------------------------------------------------------- */
-  static async isBlacklisted(input: { email: string; username?: string }): Promise<boolean> {
+  static async isBlacklisted(input: { email: string  }): Promise<boolean> {
     return await BlacklistService.isBlacklisted(input)
   }
 

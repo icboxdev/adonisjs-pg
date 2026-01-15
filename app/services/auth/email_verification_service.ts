@@ -23,10 +23,10 @@ export class EmailVerificationService {
 
   static async requestEmailVerification(params: EmailVerificationRequestParams): Promise<boolean> {
     const { user, ip = 'unknown' } = params
-    const normalizedEmail = user.email.trim().toLowerCase()
+    const normalizedEmail = user.email || user.username
 
     const rateLimitCheck = await RateLimiter.check({
-      identifier: `verify:${normalizedEmail}`,
+      identifier: `verify:${normalizedEmail.trim().toLowerCase()}`,
       ip,
       config: this.RATE_LIMIT_CONFIG,
     })
@@ -36,7 +36,7 @@ export class EmailVerificationService {
     }
 
     await RateLimiter.recordAttempt({
-      identifier: `verify:${normalizedEmail}`,
+      identifier: `verify:${normalizedEmail.trim().toLowerCase()}`,
       ip,
       config: this.RATE_LIMIT_CONFIG,
     })
@@ -44,7 +44,7 @@ export class EmailVerificationService {
     const { token, hash } = await TokenService.generateSecureToken()
 
     await TokenService.storeTokenHash({
-      key: this.getVerifyKey(normalizedEmail),
+      key: this.getVerifyKey(normalizedEmail.trim().toLowerCase()),
       hash,
       ttl: this.VERIFY_TTL,
     })
@@ -85,7 +85,7 @@ export class EmailVerificationService {
 
   private static async sendVerificationEmail(user: User, token: string): Promise<void> {
     await EmailService.send({
-      to: user.email,
+      to: user.email || user.username,
       subject: 'Verificação de E-mail',
       isHtml: true,
       body: `

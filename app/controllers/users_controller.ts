@@ -21,8 +21,7 @@ export default class UsersController {
       const payload = await request.validateUsing(userCreateValidator)
 
       const isBlacklisted = await AuthService.isBlacklisted({
-        email: payload.email,
-        username: payload.username || payload.email,
+        email: payload.email || payload.username,
       })
 
       if (isBlacklisted) {
@@ -68,7 +67,6 @@ export default class UsersController {
       if (payload.email && payload.email !== user.email) {
         const isBlacklisted = await AuthService.isBlacklisted({
           email: payload.email,
-          username: payload.email,
         })
 
         if (isBlacklisted) {

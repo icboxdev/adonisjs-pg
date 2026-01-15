@@ -138,7 +138,6 @@ export default class AuthController {
       if (payload.email && payload.email !== user.email) {
         const isBlacklisted = await AuthService.isBlacklisted({
           email: payload.email,
-          username: 'not_found',
         })
 
         if (isBlacklisted) {
